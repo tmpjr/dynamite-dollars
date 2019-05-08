@@ -22,13 +22,13 @@
     <v-container fluid fill-height>
       <v-layout row wrap>
         <v-flex xs12>
-          <v-select :items="expenseTypes" v-model="expenseType" label="Expense Type"></v-select>
+          <v-select :items="expenseTypes" v-model="expense.type" label="Expense Type"></v-select>
         </v-flex>
         <v-flex xs12>
-          <v-text-field v-model="desc" label="Description"></v-text-field>
+          <v-text-field v-model="expense.description" label="Description"></v-text-field>
         </v-flex>
         <v-flex xs12>
-          <v-text-field v-model="amount" type="number" label="Amount" prefix="$"></v-text-field>
+          <v-text-field v-model="expense.amount" type="number" label="Amount" prefix="$"></v-text-field>
         </v-flex>
         <v-flex xs12>
           <v-menu
@@ -43,14 +43,14 @@
           >
             <template v-slot:activator="{ on }">
               <v-text-field
-                v-model="date"
+                v-model="expense.date"
                 label="Date"
                 append-icon="fas fa-calendar"
                 readonly
                 v-on="on"
               ></v-text-field>
             </template>
-            <v-date-picker v-model="date" @input="dateMenu = false"></v-date-picker>
+            <v-date-picker v-model="expense.date" @input="dateMenu = false"></v-date-picker>
           </v-menu>
         </v-flex>
         <v-flex xs12>
@@ -63,32 +63,38 @@
 <script>
 import firebase from "../firebaseConfig.js";
 import { mapMutations } from "vuex";
-import UploadButton from "vuetify-upload-button";
 
 export default {
-  components: {
-    "upload-btn": UploadButton
-  },
   props: {
     id: {
       type: String,
-      default: null
+      default: "nope"
     }
   },
   data: () => {
     return {
-      amount: null,
-      desc: null,
-      date: new Date().toISOString().substr(0, 10),
+      expense: {
+        amount: null,
+        description: null,
+        date: new Date().toISOString().substr(0, 10),
+        type: "Massage",
+        file: null
+      },
       file: null,
-      fileUrl: null,
       dateMenu: false,
-      expenseType: "Massage",
-      expenseTypes: ["Massage", "Entertainment"]
+      expenseTypes: ["Massage", "Entertainment"],
+      expenseDoc: null
     };
   },
   mounted() {
-    console.log(this.id);
+    if (this.id) {
+      let ref = firebase.db.collection("expenses").doc(this.id);
+      ref.get().then(doc => {
+        if (doc.exists) {
+          this.expense = doc.data();
+        }
+      });
+    }
   },
   methods: {
     ...mapMutations({
@@ -98,18 +104,35 @@ export default {
       success: "toast/success"
     }),
     saveExpense() {
-      firebase.db
-        .collection("expenses")
-        .add({
-          description: this.desc,
-          amount: this.amount,
-          date: this.date
-        })
+      firebase.storage
+        .ref("expenses/" + this.file.name)
+        .put(this.file)
         .then(response => {
-          this.success("Successfully saved expense");
+          return response.ref.getDownloadURL();
         })
-        .catch(error => {
-          console.log(error);
+        .then(fileURL => {
+          this.expense.img = fileURL;
+          console.log("fileurl: " + fileURL);
+          if (this.id && this.expenseDoc) {
+            this.expenseDoc
+              .update(this.expense)
+              .then(() => {
+                this.success("Updated successfully");
+              })
+              .catch(error => {
+                this.alert(error.message);
+              });
+          } else {
+            firebase.db
+              .collection("expenses")
+              .add(this.expense)
+              .then(() => {
+                this.success("Created successfully");
+              })
+              .catch(error => {
+                this.alert(error.message);
+              });
+          }
         });
     },
     onChooseFile(file) {
@@ -119,16 +142,8 @@ export default {
     },
     onFileChosen(event) {
       const files = event.target.files;
-      let filename = files[0].filename;
-      if (filename.lastIndexOf(".") <= 0) {
-        this.alert("File is invalid!");
-      }
-      const fileReader = new FileReader();
-      fileReader.addEventListener("load", () => {
-        this.fileUrl = fileReader.result;
-      });
-      console.log(files);
       this.file = files[0];
+      console.log(this.file);
     },
     goBack() {
       this.$router.go(-1);

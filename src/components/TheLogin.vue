@@ -7,16 +7,14 @@
             <v-toolbar-title>Dynamite Dollars</v-toolbar-title>
           </v-toolbar>
           <v-card-text>
-            <v-form>
-              <v-text-field v-model="email" prepend-icon="fas fa-user" label="Email"></v-text-field>
-              <v-text-field
-                v-model="password"
-                prepend-icon="fas fa-lock"
-                type="password"
-                label="Password"
-              ></v-text-field>
-              <v-btn block color="accent" @click="login()">login</v-btn>
-            </v-form>
+            <v-text-field v-model="email" prepend-icon="fas fa-user" label="Email"></v-text-field>
+            <v-text-field
+              v-model="password"
+              prepend-icon="fas fa-lock"
+              type="password"
+              label="Password"
+            ></v-text-field>
+            <v-btn block color="accent" @click="login()">login</v-btn>
           </v-card-text>
         </v-card>
       </v-flex>
@@ -31,15 +29,31 @@ export default {
   data: () => {
     return {
       email: null,
-      password: null
+      password: null,
+      actionCodeSettings: {
+        url: "http://localhost:8080",
+        handleCodeInApp: true
+      }
     };
   },
   methods: {
     ...mapMutations({
       setToast: "toast/setToast",
       setToastColor: "toast/setColor",
-      alert: "toast/alert"
+      alert: "toast/alert",
+      success: "toast/success"
     }),
+    loginWithEmailLink() {
+      firebase.auth
+        .sendSignInLinkToEmail(this.email, this.actionCodeSettings)
+        .then(() => {
+          window.localStorage.setItem("emailForSignIn", this.email);
+          this.success("An login link has been sent to " + this.email + ".");
+        })
+        .catch(error => {
+          this.alert(error.message);
+        });
+    },
     login() {
       firebase.auth
         .signInWithEmailAndPassword(this.email, this.password)

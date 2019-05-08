@@ -16,15 +16,19 @@
     </v-navigation-drawer>
     <v-bottom-nav :value="showNav" fixed>
       <v-btn to="/expenses" value="expenses">
+        <span>Expenses</span>
         <v-icon>fas fa-coins</v-icon>
       </v-btn>
       <v-btn to="/expense" value="expense">
+        <span>Add Expense</span>
         <v-icon>fas fa-plus</v-icon>
       </v-btn>
       <v-btn value="menu" @click.stop="nav = !nav">
+        <span>Menu</span>
         <v-icon>fas fa-bars</v-icon>
       </v-btn>
     </v-bottom-nav>
+    <toast></toast>
   </v-app>
 </template>
 <script>
@@ -34,7 +38,7 @@ import firebase from "./firebaseConfig.js";
 export default {
   name: "App",
   components: {
-    "dd-toast": Toast
+    toast: Toast
   },
   data: () => {
     return {

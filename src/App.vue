@@ -28,17 +28,25 @@
         <v-icon>fas fa-bars</v-icon>
       </v-btn>
     </v-bottom-nav>
-    <toast></toast>
+    <v-snackbar v-model="snackbar" :color="color">{{ message }}</v-snackbar>
   </v-app>
 </template>
 <script>
-import Toast from "./components/Toast.vue";
 import firebase from "./firebaseConfig.js";
+import { mapGetters, mapMutations } from "vuex";
 
 export default {
   name: "App",
-  components: {
-    toast: Toast
+  computed: {
+    ...mapGetters("toast", ["active", "color", "message"]),
+    snackbar: {
+      get: function() {
+        return this.active;
+      },
+      set: function() {
+        this.activateSb(true);
+      }
+    }
   },
   data: () => {
     return {
@@ -58,6 +66,9 @@ export default {
     });
   },
   methods: {
+    ...mapMutations({
+      activateSb: "toast/setActive"
+    }),
     logout() {
       firebase.auth.signOut().then(() => {
         this.$router.push({ name: "login" });

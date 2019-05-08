@@ -1,34 +1,40 @@
 export const toast = {
   namespaced: true,
   state: {
-    toast: "",
-    color: "success"
+    message: "",
+    color: "info",
+    active: false
   },
   mutations: {
-    setToast(state, toast) {
-      state.toast = toast;
+    setMessage(state, message) {
+      state.message = message;
     },
     setColor(state, color) {
       state.color = color;
     },
-    alert(state, toast) {
+    error(state, message) {
       state.color = "error";
-      state.toast = toast; 
+      state.message = message; 
+      state.active = true;
     },
-    success(state, toast) {
+    success(state, message) {
       state.color = "success";
-      state.toast = toast; 
+      state.message = message; 
+      state.active = true;
+    },
+    setActive(state, active) {
+      state.active = active;
     }
   },
   getters: {
+    active: state => {
+      return state.active;
+    },
     color: state => {
       return state.color;
     },
-    toast: state => {
-      return state.toast;
-    },
-    visible: state => {
-      return state.toast != ""; 
+    message: state => {
+      return state.message;
     }
   }
 };

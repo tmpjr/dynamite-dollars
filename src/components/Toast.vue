@@ -1,15 +1,21 @@
 <template>
-  <v-snackbar v-model="visible" :color="color">
-    {{ toast }}
-    <v-btn flat color="white" @click.native="show = false">close</v-btn>
-  </v-snackbar>
+  <v-snackbar v-model="active" :color="color">{{ toast }}</v-snackbar>
 </template>
 <script>
-import { mapGetters } from "vuex";
+import { mapGetters, mapMutations } from "vuex";
 
 export default {
   computed: {
-    ...mapGetters("toast", ["toast", "color", "visible"])
+    ...mapGetters("toast", ["toast", "color", "visible"]),
+    ...mapMutations({ reset: "toast/reset" }),
+    active: {
+      get: function() {
+        return this.visible();
+      },
+      set: function() {
+        this.reset();
+      }
+    }
   },
   data: () => {
     return {};

@@ -68,7 +68,7 @@ export default {
   props: {
     id: {
       type: String,
-      default: "nope"
+      default: null
     }
   },
   data: () => {
@@ -83,14 +83,19 @@ export default {
       file: null,
       dateMenu: false,
       expenseTypes: ["Massage", "Entertainment"],
+      expenseRef: null,
       expenseDoc: null
     };
   },
   mounted() {
+    this.expenseDoc = null;
+    this.expenseRef = null;
     if (this.id) {
-      let ref = firebase.db.collection("expenses").doc(this.id);
+      const ref = firebase.db.collection("expenses").doc(this.id);
+      this.expenseRef = ref;
       ref.get().then(doc => {
         if (doc.exists) {
+          this.expenseDoc = doc;
           this.expense = doc.data();
         }
       });
@@ -98,12 +103,40 @@ export default {
   },
   methods: {
     ...mapMutations({
-      setToast: "toast/setToast",
-      setToastColor: "toast/setColor",
-      alert: "toast/alert",
-      success: "toast/success"
+      success: "toast/success",
+      error: "toast/error"
     }),
     saveExpense() {
+      console.log("saveExpense");
+      if (this.id && this.expenseRef) {
+        this.expenseRef
+          .update(this.expense)
+          .then(() => {
+            console.log("UPDATED");
+            this.success("Updated successfully");
+          })
+          .catch(error => {
+            //this.alert(error.message);
+          });
+      } else {
+        firebase.db
+          .collection("expenses")
+          .add(this.expense)
+          .then(docRef => {
+            console.log(response);
+            console.log("CREATED");
+            this.success("Created successfully");
+            return docRef;
+          })
+          .catch(error => {
+            //this.alert(error.message);
+          });
+      }
+
+      if (this.file) {
+      }
+
+      /*
       firebase.storage
         .ref("expenses/" + this.file.name)
         .put(this.file)
@@ -134,16 +167,14 @@ export default {
               });
           }
         });
+        */
     },
     onChooseFile(file) {
-      console.log("fileChanged");
-      console.log(file);
       this.$refs.fileInput.click();
     },
     onFileChosen(event) {
       const files = event.target.files;
       this.file = files[0];
-      console.log(this.file);
     },
     goBack() {
       this.$router.go(-1);

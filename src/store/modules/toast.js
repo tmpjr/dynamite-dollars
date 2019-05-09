@@ -1,40 +1,39 @@
 export const toast = {
   namespaced: true,
   state: {
-    message: "",
-    color: "info",
-    active: false
+    status: {
+      color: "info",
+      message: ""
+    }
+  },
+  actions: {
+    setCurrentStatus({commit}, currentStatus) {
+      commit("setStatus", { status: currentStatus});
+    },
+    success({commit}, msg) {
+      commit("setStatus", {status: { 
+        color: "success",
+        message: msg 
+      }});
+    },
+    error({commit}, msg) {
+      commit("setStatus",{status: { 
+        color: "error",
+        message: msg 
+      }});
+    }
   },
   mutations: {
-    setMessage(state, message) {
-      state.message = message;
-    },
-    setColor(state, color) {
-      state.color = color;
-    },
-    error(state, message) {
-      state.color = "error";
-      state.message = message; 
-      state.active = true;
-    },
-    success(state, message) {
-      state.color = "success";
-      state.message = message; 
-      state.active = true;
-    },
-    setActive(state, active) {
-      state.active = active;
+    setStatus(state, { status }) {
+      state.status = status;
     }
   },
   getters: {
-    active: state => {
-      return state.active;
-    },
     color: state => {
-      return state.color;
+      return state.status.color;
     },
     message: state => {
-      return state.message;
+      return state.status.message;
     }
   }
 };

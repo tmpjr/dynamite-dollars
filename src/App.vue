@@ -38,13 +38,16 @@ import { mapGetters, mapMutations } from "vuex";
 export default {
   name: "App",
   computed: {
-    ...mapGetters("toast", ["active", "color", "message"]),
+    ...mapGetters("toast", ["color", "message"]),
     snackbar: {
       get: function() {
-        return this.active;
+        return !this.message ? false : true;
       },
       set: function() {
-        this.activateSb(true);
+        this.$store.dispatch("toast/setCurrentStatus", {
+          color: "info",
+          message: ""
+        });
       }
     }
   },
@@ -66,9 +69,6 @@ export default {
     });
   },
   methods: {
-    ...mapMutations({
-      activateSb: "toast/setActive"
-    }),
     logout() {
       firebase.auth.signOut().then(() => {
         this.$router.push({ name: "login" });

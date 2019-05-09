@@ -62,7 +62,7 @@
 </template>
 <script>
 import firebase from "../firebaseConfig.js";
-import { mapMutations } from "vuex";
+import { mapActions } from "vuex";
 
 export default {
   props: {
@@ -102,9 +102,9 @@ export default {
     }
   },
   methods: {
-    ...mapMutations({
-      success: "toast/success",
-      error: "toast/error"
+    ...mapActions({
+      toastError: "toast/error",
+      toastSuccess: "toast/success"
     }),
     saveExpense() {
       console.log("saveExpense");
@@ -113,23 +113,25 @@ export default {
           .update(this.expense)
           .then(() => {
             console.log("UPDATED");
-            this.success("Updated successfully");
+            this.toastSuccess("Updated successfully");
           })
           .catch(error => {
-            //this.alert(error.message);
+            this.toastError(error.message);
           });
       } else {
         firebase.db
           .collection("expenses")
           .add(this.expense)
           .then(docRef => {
-            console.log(response);
+            console.log(docRef);
             console.log("CREATED");
-            this.success("Created successfully");
-            return docRef;
+            this.toastSuccess("Created successfully");
+            //return docRef;
           })
           .catch(error => {
             //this.alert(error.message);
+            console.log(error);
+            this.toastError(error.message);
           });
       }
 

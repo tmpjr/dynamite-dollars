@@ -42,7 +42,7 @@
 </template>
 <script>
 import firebase from "../firebaseConfig.js";
-import { mapActions } from "vuex";
+import { mapActions, mapMutations } from "vuex";
 
 export default {
   props: {
@@ -85,23 +85,24 @@ export default {
       toastError: "toast/error",
       toastSuccess: "toast/success"
     }),
-    loading(active) {
-      this.$eventBus.$emit("loadingActive", active);
-    },
+    ...mapMutations("loading", {
+      showLoading: "show",
+      hideLoading: "hide"
+    }),
     saveExpense() {
       console.log("saveExpense");
+      this.showLoading("Saving expense...");
       if (this.id && this.expenseRef) {
         this.expenseRef
           .update(this.expense)
           .then(() => {
             console.log("UPDATED");
-            this.$eventBus.$emit("makeToast", {
-              color: "success",
-              message: "Updated successfully"
-            });
+            this.toastSuccess("Updated successfully");
+            this.hideLoading();
           })
           .catch(error => {
             this.toastError(error.message);
+            this.hideLoading();
           });
       } else {
         firebase.db
@@ -111,12 +112,14 @@ export default {
             console.log(docRef);
             console.log("CREATED");
             this.toastSuccess("Created successfully");
+            this.hideLoading();
             //return docRef;
           })
           .catch(error => {
             //this.alert(error.message);
             console.log(error);
             this.toastError(error.message);
+            this.hideLoading();
           });
       }
 

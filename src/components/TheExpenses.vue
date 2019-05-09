@@ -2,6 +2,10 @@
   <v-card flat>
     <v-toolbar dark dense flat color="primary">
       <v-toolbar-title>Expenses</v-toolbar-title>
+      <v-spacer></v-spacer>
+      <v-btn icon @click="loadExpenses()">
+        <v-icon>fas fa-redo-alt</v-icon>
+      </v-btn>
     </v-toolbar>
     <v-data-table
       :headers="headers"
@@ -22,6 +26,7 @@
 </template>
 <script>
 import firebase from "../firebaseConfig.js";
+import { mapMutations } from "vuex";
 
 export default {
   data: () => {
@@ -52,14 +57,15 @@ export default {
     };
   },
   methods: {
-    loading(active) {
-      this.$eventBus.$emit("loadingActive", active);
-    },
+    ...mapMutations("loading", {
+      showLoading: "show",
+      hideLoading: "hide"
+    }),
     editExpense(record) {
       this.$router.push({ name: "expense", params: { id: record.id } });
     },
     loadExpenses() {
-      this.loading(true);
+      this.showLoading("Loading expenses...");
       this.expenses = [];
       firebase.db
         .collection("expenses")
@@ -72,7 +78,7 @@ export default {
             data.id = doc.id;
             this.expenses.push(data);
           });
-          this.loading(false);
+          this.hideLoading();
         });
     },
     editLink(id) {

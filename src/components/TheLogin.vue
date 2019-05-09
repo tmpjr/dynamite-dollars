@@ -2,7 +2,7 @@
   <v-container fluid fill-height>
     <v-layout align-center justify-center>
       <v-flex xs12 sm8 md4 lg2>
-        <v-card flat color="transparent" class="elevation-12">
+        <v-card color="transparent">
           <v-toolbar dark color="primary" flat dense>
             <v-toolbar-title>Dynamite Dollars</v-toolbar-title>
           </v-toolbar>
@@ -22,37 +22,21 @@
   </v-container>
 </template>
 <script>
+import { mapActions } from "vuex";
 import firebase from "../firebaseConfig.js";
 
 export default {
   data: () => {
     return {
       email: null,
-      password: null,
-      actionCodeSettings: {
-        url: "http://localhost:8080",
-        handleCodeInApp: true
-      }
+      password: null
     };
   },
   methods: {
-    loginWithEmailLink() {
-      firebase.auth
-        .sendSignInLinkToEmail(this.email, this.actionCodeSettings)
-        .then(() => {
-          window.localStorage.setItem("emailForSignIn", this.email);
-          this.$eventBus.$emit("makeToast", {
-            color: "success",
-            message: "An login link has been sent to " + this.email + "."
-          });
-        })
-        .catch(error => {
-          this.$eventBus.$emit("makeToast", {
-            color: "error",
-            message: error.message
-          });
-        });
-    },
+    ...mapActions({
+      toastError: "toast/error",
+      toastSuccess: "toast/success"
+    }),
     login() {
       firebase.auth
         .signInWithEmailAndPassword(this.email, this.password)
@@ -64,10 +48,7 @@ export default {
           }
         })
         .catch(error => {
-          this.$eventBus.$emit("makeToast", {
-            color: "error",
-            message: error.message
-          });
+          this.toastError(error.message);
         });
     }
   }

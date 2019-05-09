@@ -28,11 +28,11 @@
         <v-icon>fas fa-bars</v-icon>
       </v-btn>
     </v-bottom-nav>
-    <v-snackbar v-model="snackbar" :color="toastColor">{{ toastMessage }}</v-snackbar>
-    <v-dialog v-model="loadingDialog" hide-overlay persistent width="300">
+    <v-snackbar v-model="snackbar" :color="color">{{ message }}</v-snackbar>
+    <v-dialog v-model="loadingActive" hide-overlay persistent width="300">
       <v-card color="primary" dark>
         <v-card-text>
-          Loading...
+          {{ loadingMessage }}
           <v-progress-linear intermediate color="white" class="mb-0"></v-progress-linear>
         </v-card-text>
       </v-card>
@@ -41,18 +41,34 @@
 </template>
 <script>
 import firebase from "./firebaseConfig.js";
+import { mapGetters, mapState } from "vuex";
 
 export default {
   name: "App",
+  computed: {
+    ...mapGetters("toast", ["color", "message"]),
+    ...mapState("loading", {
+      loadingActive: state => state.active,
+      loadingMessage: state => state.message
+    }),
+    snackbar: {
+      get: function() {
+        return !this.message ? false : true;
+      },
+      set: function() {
+        this.$store.dispatch("toast/setCurrentStatus", {
+          color: "info",
+          message: ""
+        });
+      }
+    }
+  },
   data: () => {
     return {
       activeBtn: 1,
       nav: false,
       showNav: true,
-      loadingDialog: false,
-      snackbar: false,
-      toastColor: "info",
-      toastMessage: ""
+      loadingDialog: false
     };
   },
   created() {
@@ -63,15 +79,6 @@ export default {
       } else {
         this.showNav = true;
       }
-    });
-
-    this.$eventBus.$on("loadingActive", active => {
-      this.loadingDialog = active;
-    });
-    this.$eventBus.$on("makeToast", toast => {
-      this.toastMessage = toast.message;
-      this.toastColor = toast.color;
-      this.snackbar = true;
     });
   },
   methods: {

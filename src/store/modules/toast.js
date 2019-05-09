@@ -12,13 +12,13 @@ export const toast = {
     },
     success({commit}, msg) {
       commit("setStatus", {status: { 
-        color: "success",
+        color: "primary",
         message: msg 
       }});
     },
     error({commit}, msg) {
       commit("setStatus",{status: { 
-        color: "error",
+        color: "accent",
         message: msg 
       }});
     }

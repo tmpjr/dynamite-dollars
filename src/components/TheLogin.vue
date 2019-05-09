@@ -7,7 +7,7 @@
             <v-toolbar-title>Dynamite Dollars</v-toolbar-title>
           </v-toolbar>
           <v-card-text>
-            <v-text-field v-model="email" prepend-icon="fas fa-user" label="Email"></v-text-field>
+            <v-text-field v-model="email" prepend-icon="fas fa-user" type="email" label="Email"></v-text-field>
             <v-text-field
               v-model="password"
               prepend-icon="fas fa-lock"
@@ -22,7 +22,6 @@
   </v-container>
 </template>
 <script>
-import { mapMutations } from "vuex";
 import firebase from "../firebaseConfig.js";
 
 export default {
@@ -37,21 +36,21 @@ export default {
     };
   },
   methods: {
-    ...mapMutations({
-      setToast: "toast/setToast",
-      setToastColor: "toast/setColor",
-      alert: "toast/alert",
-      success: "toast/success"
-    }),
     loginWithEmailLink() {
       firebase.auth
         .sendSignInLinkToEmail(this.email, this.actionCodeSettings)
         .then(() => {
           window.localStorage.setItem("emailForSignIn", this.email);
-          this.success("An login link has been sent to " + this.email + ".");
+          this.$eventBus.$emit("makeToast", {
+            color: "success",
+            message: "An login link has been sent to " + this.email + "."
+          });
         })
         .catch(error => {
-          this.alert(error.message);
+          this.$eventBus.$emit("makeToast", {
+            color: "error",
+            message: error.message
+          });
         });
     },
     login() {
@@ -65,9 +64,10 @@ export default {
           }
         })
         .catch(error => {
-          console.log("error!");
-          console.log(error.message);
-          this.alert(error.message);
+          this.$eventBus.$emit("makeToast", {
+            color: "error",
+            message: error.message
+          });
         });
     }
   }

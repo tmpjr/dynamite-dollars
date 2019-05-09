@@ -8,6 +8,7 @@ import firebase from "./firebaseConfig.js";
 
 Vue.config.productionTip = false
 Vue.prototype.$user = null;
+Vue.prototype.$eventBus = new Vue();
 
 new Vue({
   router,

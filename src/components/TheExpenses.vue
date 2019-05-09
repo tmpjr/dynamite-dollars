@@ -22,7 +22,6 @@
 </template>
 <script>
 import firebase from "../firebaseConfig.js";
-import { mapMutations } from "vuex";
 
 export default {
   data: () => {
@@ -53,16 +52,14 @@ export default {
     };
   },
   methods: {
-    ...mapMutations({
-      setToast: "toast/setToast",
-      setToastColor: "toast/setColor"
-    }),
+    loading(active) {
+      this.$eventBus.$emit("loadingActive", active);
+    },
     editExpense(record) {
-      console.log("editExpense");
-      console.log(record);
       this.$router.push({ name: "expense", params: { id: record.id } });
     },
     loadExpenses() {
+      this.loading(true);
       this.expenses = [];
       firebase.db
         .collection("expenses")
@@ -75,6 +72,7 @@ export default {
             data.id = doc.id;
             this.expenses.push(data);
           });
+          this.loading(false);
         });
     },
     editLink(id) {

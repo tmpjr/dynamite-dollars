@@ -31,27 +31,7 @@
           <v-text-field v-model="expense.amount" type="number" label="Amount" prefix="$"></v-text-field>
         </v-flex>
         <v-flex xs12>
-          <v-menu
-            v-model="dateMenu"
-            :close-on-content-click="false"
-            :nudge-right="40"
-            lazy
-            transition="scale-transition"
-            offset-y
-            full-width
-            min-width="290px"
-          >
-            <template v-slot:activator="{ on }">
-              <v-text-field
-                v-model="expense.date"
-                label="Date"
-                append-icon="fas fa-calendar"
-                readonly
-                v-on="on"
-              ></v-text-field>
-            </template>
-            <v-date-picker v-model="expense.date" @input="dateMenu = false"></v-date-picker>
-          </v-menu>
+          <v-text-field type="date" v-model="expense.date" label="Date"></v-text-field>
         </v-flex>
         <v-flex xs12>
           <div class="text-xs-center"></div>
@@ -81,7 +61,6 @@ export default {
         file: null
       },
       file: null,
-      dateMenu: false,
       expenseTypes: ["Massage", "Entertainment"],
       expenseRef: null,
       expenseDoc: null
@@ -106,6 +85,9 @@ export default {
       toastError: "toast/error",
       toastSuccess: "toast/success"
     }),
+    loading(active) {
+      this.$eventBus.$emit("loadingActive", active);
+    },
     saveExpense() {
       console.log("saveExpense");
       if (this.id && this.expenseRef) {
@@ -113,7 +95,10 @@ export default {
           .update(this.expense)
           .then(() => {
             console.log("UPDATED");
-            this.toastSuccess("Updated successfully");
+            this.$eventBus.$emit("makeToast", {
+              color: "success",
+              message: "Updated successfully"
+            });
           })
           .catch(error => {
             this.toastError(error.message);

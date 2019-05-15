@@ -76,6 +76,7 @@ export default {
       if (!user) {
         console.log("hiding bottom nav");
         this.showNav = false;
+        this.hideLoading();
       } else {
         this.showNav = true;
       }

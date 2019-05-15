@@ -35,21 +35,20 @@
         </v-flex>
         <v-flex xs12 v-if="expense.imageUrl">
           <v-card flat>
-            <v-toolbar dark dense flat color="accent">
+            <v-toolbar dense flat color="transparent">
               <v-toolbar-title>Image Preview</v-toolbar-title>
+              <v-spacer></v-spacer>
+              <v-spacer></v-spacer>
+              <v-btn small color="error" flat dark icon @click="deleteImage()">
+                <v-icon small>fas fa-trash</v-icon>
+              </v-btn>
+              <v-btn small color="primary" flat dark icon @click="downloadImage()">
+                <v-icon small>fas fa-download</v-icon>
+              </v-btn>
             </v-toolbar>
             <v-card-text>
               <v-img v-if="expense.imageUrl" :src="expense.imageUrl"></v-img>
             </v-card-text>
-            <v-card-actions>
-              <v-spacer></v-spacer>
-              <v-btn color="error" dark icon>
-                <v-icon>fas fa-trash</v-icon>
-              </v-btn>
-              <v-btn color="primary" dark icon>
-                <v-icon>fas fa-download</v-icon>
-              </v-btn>
-            </v-card-actions>
           </v-card>
         </v-flex>
       </v-layout>
@@ -83,19 +82,7 @@ export default {
     };
   },
   mounted() {
-    this.expenseDoc = null;
-    this.expenseRef = null;
-    if (this.id) {
-      const ref = firebase.db.collection("expenses").doc(this.id);
-      this.expenseRef = ref;
-      ref.get().then(doc => {
-        if (doc.exists) {
-          this.expenseDoc = doc;
-          this.expense = doc.data();
-          console.log(this.expense.imageUrl);
-        }
-      });
-    }
+    this.loadExpense();
   },
   methods: {
     ...mapActions({
@@ -106,16 +93,68 @@ export default {
       showLoading: "show",
       hideLoading: "hide"
     }),
+    loadExpense() {
+      this.expenseDoc = null;
+      this.expenseRef = null;
+      if (this.id) {
+        const ref = firebase.db.collection("expenses").doc(this.id);
+        this.expenseRef = ref;
+        ref.get().then(doc => {
+          if (doc.exists) {
+            this.expenseDoc = doc;
+            this.expense = doc.data();
+          }
+        });
+      }
+    },
+    downloadImage() {
+      let xhr = new XMLHttpRequest();
+      xhr.responseType = "blob";
+      let self = this;
+      xhr.onload = function(event) {
+        let blob = xhr.response;
+        let a = document.createElement("a");
+        a.href = window.URL.createObjectURL(xhr.response);
+        a.download = "reciept-" + self.id + ".jpg";
+        a.style.display = "none";
+        document.body.appendChild(a);
+        a.click();
+      };
+      xhr.open("GET", this.expense.imageUrl);
+      xhr.send();
+    },
+    deleteImage() {
+      this.showLoading("Deleting image...");
+      firebase.storage
+        .refFromURL(this.expense.imageUrl)
+        .delete()
+        .then(() => {
+          this.expenseRef
+            .update({
+              imageUrl: null
+            })
+            .then(() => {
+              this.hideLoading();
+              this.toastSuccess("Image deleted");
+              this.loadExpense();
+            })
+            .catch(error => {
+              this.toastError(error.message);
+            });
+        })
+        .catch(error => {
+          this.toastError(error.message);
+        });
+    },
     saveExpense() {
-      console.log("saveExpense");
       this.showLoading("Saving expense...");
       if (this.id && this.expenseRef) {
         this.expenseRef
           .update(this.expense)
           .then(() => {
-            console.log("UPDATED");
             this.toastSuccess("Updated successfully");
             this.hideLoading();
+            this.loadExpense();
           })
           .catch(error => {
             this.toastError(error.message);
@@ -126,8 +165,6 @@ export default {
           .collection("expenses")
           .add(this.expense)
           .then(docRef => {
-            console.log(docRef);
-            console.log("CREATED");
             this.expenseDoc = docRef;
             this.toastSuccess(
               "Created successfully. You may now upload a file."
@@ -165,6 +202,7 @@ export default {
             .then(() => {
               this.hideLoading();
               this.toastSuccess("Image uploaded successfully");
+              this.loadExpense();
             })
             .catch(error => {
               this.hideLoading();

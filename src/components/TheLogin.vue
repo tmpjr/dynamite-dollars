@@ -22,7 +22,7 @@
   </v-container>
 </template>
 <script>
-import { mapActions } from "vuex";
+import { mapActions, mapMutations } from "vuex";
 import firebase from "../firebaseConfig.js";
 
 export default {
@@ -32,7 +32,14 @@ export default {
       password: null
     };
   },
+  mounted() {
+    this.hideLoading();
+  },
   methods: {
+    ...mapMutations("loading", {
+      showLoading: "show",
+      hideLoading: "hide"
+    }),
     ...mapActions({
       toastError: "toast/error",
       toastSuccess: "toast/success"
@@ -42,6 +49,7 @@ export default {
         .signInWithEmailAndPassword(this.email, this.password)
         .then(user => {
           if (!user) {
+            this.toastError("Login Failed");
             this.$router.push("/login");
           } else {
             this.$router.push({ path: "expenses" });

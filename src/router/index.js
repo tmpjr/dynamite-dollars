@@ -34,6 +34,10 @@ let router = new Router({
       meta: {
         requiresAuth: false
       }
+    },
+    {
+      path: "/",
+      redirect: "expenses"
     }
   ]
 });

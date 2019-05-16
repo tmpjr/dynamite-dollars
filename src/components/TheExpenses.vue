@@ -69,7 +69,8 @@ export default {
       this.expenses = [];
       firebase.db
         .collection("expenses")
-        .where("date", ">", "")
+        .where("removed", "<", 1)
+        .orderBy("removed")
         .orderBy("date", "desc")
         .get()
         .then(q => {

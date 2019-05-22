@@ -29,9 +29,9 @@
         <span>Add Expense</span>
         <v-icon>fas fa-plus</v-icon>
       </v-btn>
-      <v-btn value="menu" @click.stop="nav = !nav">
-        <span>Menu</span>
-        <v-icon>fas fa-bars</v-icon>
+      <v-btn to="/dashboard" value="dashboard">
+        <span>Dashboard</span>
+        <v-icon>fas fa-tachometer-alt</v-icon>
       </v-btn>
     </v-bottom-nav>
     <v-snackbar v-model="snackbar" :color="color">{{ message }}</v-snackbar>

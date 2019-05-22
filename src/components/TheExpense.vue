@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-card flat>
+    <v-card flat color="transparent">
       <v-toolbar dense color="primary" flat>
         <v-btn icon dark @click="goBack()">
           <v-icon dark>fas fa-arrow-left</v-icon>

@@ -1,5 +1,5 @@
 <template>
-  <v-card flat>
+  <v-card flat color="transparent">
     <v-toolbar dark dense flat color="primary">
       <v-toolbar-title>Expenses</v-toolbar-title>
       <v-spacer></v-spacer>

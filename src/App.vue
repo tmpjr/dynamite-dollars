@@ -5,6 +5,12 @@
     </v-content>
     <v-navigation-drawer app right v-model="nav" fixed temporary>
       <v-list class="pa-1">
+        <v-list-tile :to="{name: 'dashboard' }">
+          <v-list-tile-action>
+            <v-icon>fas fa-tachometer-alt</v-icon>
+          </v-list-tile-action>
+          <v-list-tile-content>Dashboard</v-list-tile-content>
+        </v-list-tile>
         <v-divider></v-divider>
         <v-list-tile @click="logout()">
           <v-list-tile-action>
@@ -74,7 +80,6 @@ export default {
   created() {
     firebase.auth.onAuthStateChanged(user => {
       if (!user) {
-        console.log("hiding bottom nav");
         this.showNav = false;
         this.hideLoading();
       } else {

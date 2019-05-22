@@ -15,7 +15,6 @@ new Vue({
   store,
   created() {
     firebase.auth.onAuthStateChanged(user => {
-      console.log(user);
       if (!user) {
         this.$router.push("/login");
       } 

@@ -10,9 +10,6 @@
 yarn install
 ```
 
-### Configure Firebase
-
-
 ### Compiles and hot-reloads for development
 ```
 yarn serve

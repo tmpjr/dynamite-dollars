@@ -1,15 +1,17 @@
 # dynamite-dollars
 
-## Project setup
-Install Firebase CLI: https://firebase.google.com/docs/cli
+## Firebase setup
+* Install Firebase CLI: https://firebase.google.com/docs/cli
+* Copy src/config.tpl.js to config.js
+* Edit config.js and provide your firebase configuration
 
+## Project setup
 ```
 yarn install
 ```
 
 ### Configure Firebase
-Copy src/config.tpl.js to config.js
-Edit config.js and provide your firebase configuration
+
 
 ### Compiles and hot-reloads for development
 ```

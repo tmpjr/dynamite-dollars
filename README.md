@@ -1,5 +1,10 @@
 # dynamite-dollars
 
+## Firebase setup
+* Install Firebase CLI: https://firebase.google.com/docs/cli
+* Copy src/config.tpl.js to config.js
+* Edit config.js and provide your firebase configuration
+
 ## Project setup
 ```
 yarn install
@@ -7,23 +12,20 @@ yarn install
 
 ### Compiles and hot-reloads for development
 ```
-yarn run serve
+yarn serve
 ```
 
 ### Compiles and minifies for production
 ```
-yarn run build
+yarn build
 ```
 
-### Run your tests
+### Deploy
 ```
-yarn run test
-```
-
-### Lints and fixes files
-```
-yarn run lint
+firebase deploy
 ```
 
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+### Build & Deploy
+```
+yarn build && firebase deploy
+```

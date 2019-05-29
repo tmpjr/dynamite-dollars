@@ -4,12 +4,23 @@
       <v-toolbar-title>Expenses Overview</v-toolbar-title>
     </v-toolbar>
     <v-card-text>
-      <expense-pie-chart v-if="loaded" :chart-data="chartData"></expense-pie-chart>
+      <v-layout row wrap>
+        <v-flex xs12>
+          <v-text-field v-model="start" type="date" label="Start Date"></v-text-field>
+        </v-flex>
+        <v-flex xs12>
+          <v-text-field v-model="end" type="date" label="End Date"></v-text-field>
+        </v-flex>
+        <v-flex xs12>
+          <expense-pie-chart v-if="loaded" :chart-data="chartData"></expense-pie-chart>
+        </v-flex>
+      </v-layout>
     </v-card-text>
   </v-card>
 </template>
 <script>
 import firebase from "../firebaseConfig.js";
+import moment from "moment";
 import ExpensePieChart from "./ExpensePieChart.vue";
 import { mapMutations } from "vuex";
 
@@ -19,6 +30,10 @@ export default {
   },
   data: () => {
     return {
+      start: moment()
+        .startOf("year")
+        .format("YYYY-MM-DD"),
+      end: moment().format("YYYY-MM-DD"),
       loaded: false,
       chartData: {
         labels: ["Massage", "Entertainment"],
@@ -38,12 +53,23 @@ export default {
       hideLoading: "hide"
     })
   },
+  watch: {
+    start(val) {
+      console.log(val);
+    }
+  },
   mounted() {
     this.showLoading("Bear cub conoodling");
     this.loaded = false;
+    const start = moment(this.start).unix();
+    const end = moment(this.end).unix();
+    console.log(start);
+    console.log(end);
     firebase.db
       .collection("expenses")
       .where("removed", "<", 1)
+      .where("dateUnix", ">=", start)
+      .where("dateUnix", "<=", end)
       .orderBy("removed")
       .orderBy("date", "desc")
       .get()

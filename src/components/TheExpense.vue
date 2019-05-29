@@ -19,41 +19,62 @@
           accept="image/*"
           @change="onFileChosen"
         >
-        <v-btn icon dark @click="saveExpense()">
+        <v-btn icon dark :disabled="!valid" @click="saveExpense()">
           <v-icon dark>fas fa-check</v-icon>
         </v-btn>
       </v-toolbar>
       <v-container fluid fill-height>
         <v-layout row wrap>
           <v-flex xs12>
-            <v-select :items="expenseTypes" v-model="expense.type" label="Expense Type"></v-select>
-          </v-flex>
-          <v-flex xs12>
-            <v-text-field v-model="expense.description" label="Description"></v-text-field>
-          </v-flex>
-          <v-flex xs12>
-            <v-text-field v-model="expense.amount" type="number" label="Amount" prefix="$"></v-text-field>
-          </v-flex>
-          <v-flex xs12>
-            <v-text-field type="date" v-model="expense.date" label="Date"></v-text-field>
-          </v-flex>
-          <v-flex xs12 v-if="expense.imageUrl">
-            <v-card flat>
-              <v-toolbar dense flat color="transparent">
-                <v-toolbar-title>Image Preview</v-toolbar-title>
-                <v-spacer></v-spacer>
-                <v-spacer></v-spacer>
-                <v-btn small color="error" flat dark icon @click="deleteImageDialog = true">
-                  <v-icon small>fas fa-trash</v-icon>
-                </v-btn>
-                <v-btn small color="primary" flat dark icon @click="downloadImage()">
-                  <v-icon small>fas fa-download</v-icon>
-                </v-btn>
-              </v-toolbar>
-              <v-card-text>
-                <v-img v-if="expense.imageUrl" :src="expense.imageUrl"></v-img>
-              </v-card-text>
-            </v-card>
+            <v-form ref="form" v-model="valid">
+              <v-layout row wrap>
+                <v-flex xs12>
+                  <v-select :items="expenseTypes" v-model="expense.type" label="Expense Type"></v-select>
+                </v-flex>
+                <v-flex xs12>
+                  <v-text-field
+                    v-model="expense.description"
+                    label="Description"
+                    :rules="[v => !!v || 'Description is required!']"
+                  ></v-text-field>
+                </v-flex>
+                <v-flex xs12>
+                  <v-text-field
+                    v-model="expense.amount"
+                    type="number"
+                    label="Amount"
+                    prefix="$"
+                    :rules="[v => !!v || 'Amount is required!']"
+                  ></v-text-field>
+                </v-flex>
+                <v-flex xs12>
+                  <v-text-field
+                    type="date"
+                    v-model="expense.date"
+                    label="Date"
+                    :rules="[v => !!v || 'Date is required!']"
+                  ></v-text-field>
+                </v-flex>
+                <v-flex xs12 v-if="expense.imageUrl">
+                  <v-card flat>
+                    <v-toolbar dense flat color="transparent">
+                      <v-toolbar-title>Image Preview</v-toolbar-title>
+                      <v-spacer></v-spacer>
+                      <v-spacer></v-spacer>
+                      <v-btn small color="error" flat dark icon @click="deleteImageDialog = true">
+                        <v-icon small>fas fa-trash</v-icon>
+                      </v-btn>
+                      <v-btn small color="primary" flat dark icon @click="downloadImage()">
+                        <v-icon small>fas fa-download</v-icon>
+                      </v-btn>
+                    </v-toolbar>
+                    <v-card-text>
+                      <v-img v-if="expense.imageUrl" :src="expense.imageUrl"></v-img>
+                    </v-card-text>
+                  </v-card>
+                </v-flex>
+              </v-layout>
+            </v-form>
           </v-flex>
         </v-layout>
       </v-container>
@@ -82,6 +103,7 @@
 </template>
 <script>
 import firebase from "../firebaseConfig.js";
+import moment from "moment";
 import { mapActions, mapMutations } from "vuex";
 
 export default {
@@ -93,12 +115,13 @@ export default {
   },
   data: () => {
     return {
+      valid: true,
       deleteImageDialog: false,
       removeExpenseDialog: false,
       expense: {
         amount: null,
         description: null,
-        date: new Date().toISOString().substr(0, 10),
+        date: moment().format("YYYY-MM-DD"),
         type: "Massage",
         imageUrl: null,
         removed: 0
@@ -108,6 +131,11 @@ export default {
       expenseRef: null,
       expenseDoc: null
     };
+  },
+  computed: {
+    dateUnix() {
+      return moment(this.date).unix();
+    }
   },
   mounted() {
     this.loadExpense();
@@ -195,6 +223,8 @@ export default {
     },
     saveExpense() {
       this.showLoading("Saving expense...");
+      this.expense.dateUnix = this.dateUnix;
+      console.log(this.expense);
       if (this.id && this.expenseRef) {
         this.expenseRef
           .update(this.expense)

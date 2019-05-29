@@ -13,6 +13,8 @@ export default {
         maintainAspectRatio: false,
         plugins: {
           labels: {
+            fontSize: 14,
+            fontColor: "#fff",
             render: args => {
               return "$" + args.value;
             }

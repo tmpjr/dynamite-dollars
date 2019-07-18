@@ -3,24 +3,7 @@
     <v-content>
       <router-view></router-view>
     </v-content>
-    <v-navigation-drawer app right v-model="nav" fixed temporary>
-      <v-list class="pa-1">
-        <v-list-tile :to="{name: 'dashboard' }">
-          <v-list-tile-action>
-            <v-icon>fas fa-tachometer-alt</v-icon>
-          </v-list-tile-action>
-          <v-list-tile-content>Dashboard</v-list-tile-content>
-        </v-list-tile>
-        <v-divider></v-divider>
-        <v-list-tile @click="logout()">
-          <v-list-tile-action>
-            <v-icon>fas fa-sign-out-alt</v-icon>
-          </v-list-tile-action>
-          <v-list-tile-content>Logout</v-list-tile-content>
-        </v-list-tile>
-      </v-list>
-    </v-navigation-drawer>
-    <v-bottom-nav :value="showNav" fixed>
+    <v-bottom-navigation :value="showNav" app>
       <v-btn to="/expenses" value="expenses">
         <span>Expenses</span>
         <v-icon>fas fa-coins</v-icon>
@@ -33,7 +16,7 @@
         <span>Dashboard</span>
         <v-icon>fas fa-tachometer-alt</v-icon>
       </v-btn>
-    </v-bottom-nav>
+    </v-bottom-navigation>
     <v-snackbar v-model="snackbar" :color="color">{{ message }}</v-snackbar>
     <v-dialog v-model="loadingActive" hide-overlay persistent width="300">
       <v-card color="primary" dark>

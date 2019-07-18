@@ -1,15 +1,10 @@
-import Vue from 'vue'
-import Vuetify from 'vuetify/lib'
-import 'vuetify/src/stylus/app.styl'
-import { Ripple } from "vuetify/lib/directives";
+import Vue from 'vue';
+import Vuetify from 'vuetify/lib';
 
-Vue.use(Vuetify, {
-  iconfont: 'fa',
-  theme: {
-    primary: "#03A9F4",
-    accent: "#FF4081" 
-  },
-  directives: {
-    Ripple
+Vue.use(Vuetify);
+
+export default new Vuetify({
+  icons: {
+    iconfont: 'fa'
   }
-})
+});

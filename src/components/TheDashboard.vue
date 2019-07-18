@@ -67,11 +67,9 @@ export default {
     console.log(end);
     firebase.db
       .collection("expenses")
-      .where("removed", "<", 1)
       .where("dateUnix", ">=", start)
       .where("dateUnix", "<=", end)
-      .orderBy("removed")
-      .orderBy("date", "desc")
+      .orderBy("dateUnix", "desc")
       .get()
       .then(q => {
         this.loaded = true;
@@ -80,6 +78,8 @@ export default {
         let datasets = [0, 0];
         q.forEach(doc => {
           let data = doc.data();
+          console.log(data);
+          //if (data.removed < 1) {
           data.id = doc.id;
           amount = Number(data.amount);
           if (data.type === "Massage") {
@@ -87,6 +87,7 @@ export default {
           } else {
             datasets[1] += amount;
           }
+          //}
         });
         this.chartData.datasets[0].data = datasets;
       });

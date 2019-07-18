@@ -1,6 +1,7 @@
 <template>
   <v-card flat color="transparent">
     <v-toolbar dark dense flat color="primary">
+      <v-icon left>fas fa-coins</v-icon>
       <v-toolbar-title>Expenses</v-toolbar-title>
       <v-spacer></v-spacer>
       <v-btn icon @click="loadExpenses()">
@@ -10,15 +11,19 @@
     <v-data-table
       :headers="headers"
       :items="expenses"
-      :pagination.sync="pagination"
-      :expand="expand"
+      :sort-by.sync="sortBy"
+      :sort-desc.sync="descending"
+      :items-per-page="-1"
+      :mobile-breakpoint="0"
+      virtual-rows
+      hide-default-footer
       item-key="id"
     >
-      <template v-slot:items="props">
-        <tr @click="editExpense(props.item)">
-          <td class="text-xs-left">{{ props.item.description }}</td>
-          <td class="text-xs-right">{{ props.item.date }}</td>
-          <td class="text-xs-right">{{ props.item.amount }}</td>
+      <template v-slot:body="{ items }">
+        <tr v-for="item in items" :key="item.name" @click="editExpense(item)">
+          <td>{{ item.description }}</td>
+          <td class="text-xs-right">{{ item.date }}</td>
+          <td class="text-xs-right">{{ item.amount }}</td>
         </tr>
       </template>
     </v-data-table>
@@ -48,11 +53,9 @@ export default {
           value: "amount"
         }
       ],
-      pagination: {
-        rowsPerPage: 10,
-        sortBy: "date",
-        descending: true
-      },
+      sortBy: "date",
+      descending: true,
+      rowsPerPage: 10,
       expenses: []
     };
   },
@@ -62,6 +65,7 @@ export default {
       hideLoading: "hide"
     }),
     editExpense(record) {
+      console.log("editExpense");
       this.$router.push({ name: "expense", params: { id: record.id } });
     },
     loadExpenses() {

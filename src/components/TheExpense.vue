@@ -18,7 +18,7 @@
           ref="fileInput"
           accept="image/*"
           @change="onFileChosen"
-        >
+        />
         <v-btn icon dark :disabled="!valid" @click="saveExpense()">
           <v-icon dark>fas fa-check</v-icon>
         </v-btn>
@@ -119,6 +119,7 @@ export default {
       deleteImageDialog: false,
       removeExpenseDialog: false,
       expense: {
+        id: null,
         amount: null,
         description: null,
         date: moment().format("YYYY-MM-DD"),
@@ -133,6 +134,9 @@ export default {
     };
   },
   computed: {
+    currentUnixTime() {
+      return moment().unix();
+    },
     dateUnix() {
       return moment(this.date).unix();
     }
@@ -224,8 +228,8 @@ export default {
     saveExpense() {
       this.showLoading("Saving expense...");
       this.expense.dateUnix = this.dateUnix;
-      console.log(this.expense);
-      if (this.id && this.expenseRef) {
+      if (this.expenseRef && this.expense.id) {
+        this.expense.dateUpdated = this.currentUnixTime;
         this.expenseRef
           .update(this.expense)
           .then(() => {
@@ -238,6 +242,8 @@ export default {
             this.hideLoading();
           });
       } else {
+        this.expense.dateCreated = this.currentUnixTime;
+        this.expense.dateUpdated = this.currentUnixTime;
         firebase.db
           .collection("expenses")
           .add(this.expense)
@@ -247,11 +253,9 @@ export default {
               "Created successfully. You may now upload a file."
             );
             this.hideLoading();
-            //return docRef;
+            this.$router.push({ name: "expenses" });
           })
           .catch(error => {
-            //this.alert(error.message);
-            console.log(error);
             this.toastError(error.message);
             this.hideLoading();
           });
@@ -292,7 +296,7 @@ export default {
         });
     },
     goBack() {
-      this.$router.go(-1);
+      this.$router.push({ name: "expenses" });
     }
   }
 };

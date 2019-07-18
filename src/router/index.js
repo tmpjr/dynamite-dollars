@@ -8,7 +8,6 @@ import firebase from "../firebaseConfig.js";
 
 Vue.use(Router)
 
-
 let router = new Router({
   routes: [
     {

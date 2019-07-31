@@ -127,6 +127,15 @@ export default {
         imageUrl: null,
         removed: 0
       },
+      defaultExpense: {
+        id: null,
+        amount: null,
+        description: null,
+        date: moment().format("YYYY-MM-DD"),
+        type: "Massage",
+        imageUrl: null,
+        removed: 0
+      },
       file: null,
       expenseTypes: ["Massage", "Entertainment"],
       expenseRef: null,
@@ -141,8 +150,20 @@ export default {
       return moment(this.date).unix();
     }
   },
+  /*
   mounted() {
-    this.loadExpense();
+    console.log("mounted:");
+    console.log(this.$route.params);
+    if (this.$route.params.id) {
+      this.loadExpense(this.$route.params.id);
+    }
+  },
+  */
+  created() {
+    if (this.id) {
+      this.expense.id = this.id;
+      this.loadExpense();
+    }
   },
   methods: {
     ...mapActions({
@@ -156,8 +177,8 @@ export default {
     loadExpense() {
       this.expenseDoc = null;
       this.expenseRef = null;
-      if (this.id) {
-        const ref = firebase.db.collection("expenses").doc(this.id);
+      if (this.expense.id) {
+        const ref = firebase.db.collection("expenses").doc(this.expense.id);
         this.expenseRef = ref;
         ref.get().then(doc => {
           if (doc.exists) {
@@ -253,9 +274,12 @@ export default {
               "Created successfully. You may now upload a file."
             );
             this.hideLoading();
-            this.$router.push({ name: "expenses" });
+            this.$router.push({ name: "expense", params: { id: docRef.id } });
+            this.expense.id = docRef.id;
+            this.loadExpense();
           })
           .catch(error => {
+            console.log(error.message);
             this.toastError(error.message);
             this.hideLoading();
           });

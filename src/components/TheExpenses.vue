@@ -18,15 +18,8 @@
       virtual-rows
       hide-default-footer
       item-key="id"
-    >
-      <template v-slot:body="{ items }">
-        <tr v-for="item in items" :key="item.name" @click="editExpense(item)">
-          <td>{{ item.description }}</td>
-          <td class="text-xs-right">{{ item.date }}</td>
-          <td class="text-xs-right">{{ item.amount }}</td>
-        </tr>
-      </template>
-    </v-data-table>
+      @click:row="editExpense"
+    ></v-data-table>
   </v-card>
 </template>
 <script>

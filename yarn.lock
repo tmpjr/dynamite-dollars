@@ -8019,10 +8019,10 @@ vuetify-loader@^1.2.2:
   dependencies:
     loader-utils "^1.2.0"
 
-vuetify@^2.0.3:
-  version "2.0.3"
-  resolved "https://registry.yarnpkg.com/vuetify/-/vuetify-2.0.3.tgz#3fdca5df2e326c203d96561443087a9c756341de"
-  integrity sha512-XJ70Iex/BBwxbmf+s2hCpyrDPsXuuQkGod+dthiQkAf9N28tzyYD0vxS3r6U1o7Oaqmo1ctzLhlAw074asdGFg==
+vuetify@^2.6.10:
+  version "2.6.10"
+  resolved "https://registry.yarnpkg.com/vuetify/-/vuetify-2.6.10.tgz#b86cd7a97bf8cd3828a72c349795b5b3c539ebc2"
+  integrity sha512-fgUeRDDCwYkwu6WGEEKGe7IdfzOsXJCZGrqkn1pcS2ycuoDL8mR2/dejH5iFNnBY6MnsT365PAGn0J+9otjfQg==
 
 vuex@^3.1.1:
   version "3.1.1"
